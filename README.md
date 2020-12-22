@@ -1,37 +1,3 @@
-# CoreRT ARMEL ILC Compiler Container - Dockerfile
-FROM debian:buster
-
-RUN apt-get update
-RUN apt-get install -y binfmt-support binutils-arm-linux-gnueabi build-essential clang cmake curl debootstrap gettext git gpg libbz2-dev libcurl4-openssl-dev libicu-dev libkrb5-dev liblldb-dev liblttng-ust-dev libncurses5-dev libncursesw5-dev libnuma-dev libreadline-dev libsqlite3-dev libssl-dev libunwind8 libunwind8-dev lldb llvm make parallel qemu qemu-user-static wget zlib1g-dev apt-transport-https
-
-# Install dotnet SDK 3.1
-# https://docs.microsoft.com/en-us/dotnet/core/install/linux-debian
-RUN wget https://packages.microsoft.com/config/debian/10/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
-RUN dpkg -i packages-microsoft-prod.deb
-RUN apt-get update
-RUN apt-get install -y dotnet-sdk-3.1
-
-RUN mkdir dotnet
-WORKDIR /dotnet/
-RUN git clone https://github.com/Tryll/CoreRT-armel
-#RUN git clone https://github.com/dotnet/corefx --branch release/3.1
-#RUN git clone https://github.com/dotnet/coreclr --branch release/3.1
-
-# Cross-Build CoreRT
-# https://github.com/dotnet/corert/blob/master/Documentation/cross-building.md
-WORKDIR /dotnet/CoreRT-armel/
-RUN ./cross/build-rootfs.sh armel
-RUN ./cross/build-rootfs.sh x86 xenial
-
-RUN echo check_certificate = off > $HOME/.wgetrc
-RUN echo insecure > $HOME/.curlrc
-
-WORKDIR /dotnet/CoreRT-armel/
-RUN ./build.sh armel release cross skiptests
-RUN ./build.sh x86 debug cross crosstarget skiptests
-
-
-
 # .NET Core Runtime (CoreRT)
 
 ### This project is superseded by [NativeAOT experiment in dotnet/runtimelab repo]( https://github.com/dotnet/runtimelab/tree/feature/NativeAOT).
