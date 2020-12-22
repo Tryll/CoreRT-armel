@@ -30,7 +30,7 @@ RUN echo insecure > $HOME/.curlrc
 
 WORKDIR /dotnet/CoreRT-armel/
 RUN ./build.sh armel release cross skiptests
-RUN ./build.sh x86 debug cross crosstarget skiptests
+#RUN ./build.sh x86 debug cross crosstarget skiptests
 ```
 
 
